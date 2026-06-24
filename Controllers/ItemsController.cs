@@ -5,7 +5,6 @@ using LostAndFound.Models;
 using LostAndFound.Models.Entities;
 using static LostAndFound.Models.AddItemViewModel;
 
-
 namespace LostAndFound.Controllers
 {
     public class ItemsController : Controller
@@ -17,14 +16,31 @@ namespace LostAndFound.Controllers
             this.dbContext = dbContext;
         }
 
+        // GET: /Items/Details/5
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            var item = await dbContext.Items
+                .Include(i => i.Category)
+                .Include(i => i.User)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (item == null)
+                return NotFound();
+
+            return View(item);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Add()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
             var viewModel = new AddItemViewModel
             {
@@ -41,9 +57,7 @@ namespace LostAndFound.Controllers
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
             if (!ModelState.IsValid)
             {

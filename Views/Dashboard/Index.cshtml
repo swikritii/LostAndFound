@@ -1,601 +1,450 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
-    Layout = null;
+﻿@model List<LostAndFound.Models.Entities.Item>
+
+@{
+    var items = Model ?? new List<LostAndFound.Models.Entities.Item>();
+    var lostCount = items.Count(i => i.Status == "Lost");
+    var foundCount = items.Count(i => i.Status == "Found");
+    var userName = Context.Session.GetString("UserName") ?? "there";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard — LostAndFound</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-    <style>
-            *, *::before, *::after {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #F8F9FA;
+        min-height: 100vh;
+    }
+
+    /* NAV */
+    .lf-nav {
+        background: #fff;
+        border-bottom: 1px solid #EBEBEB;
+        padding: 16px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .lf-nav-logo {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: -.3px;
+    }
+
+        .lf-nav-logo span {
+            color: #C2185B;
+        }
+
+    .lf-nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .lf-nav-user {
+        font-size: .85rem;
+        color: #888;
+    }
+
+        .lf-nav-user strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+    .lf-logout {
+        font-size: .82rem;
+        padding: 7px 18px;
+        border-radius: 8px;
+        border: 1px solid #E0E0E0;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all .15s;
+    }
+
+        .lf-logout:hover {
+            border-color: #C2185B;
+            color: #C2185B;
+        }
+
+    /* WRAP */
+    .lf-wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 40px 24px 80px;
+    }
+
+    /* GREETING */
+    .lf-greeting {
+        background: #1a1a1a;
+        border-radius: 16px;
+        padding: 40px 44px;
+        color: #fff;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+        .lf-greeting h1 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: -.4px;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+            .lf-greeting h1 span {
+                color: #E91E8C;
             }
 
-            :root {
-                --bg: #F7F8FA;
-                --surface: #FFFFFF;
-                --border: #E8EAF0;
-                --text: #111318;
-                --muted: #7A7F8E;
-                --accent: #3D5AFE;
-                --accent-lt: #EEF1FF;
-                --green: #00C48C;
-                --amber: #FFB930;
-                --red: #FF5C5C;
-                --radius: 14px;
-                --shadow: 0 2px 16px rgba(0,0,0,.06);
-            }
+        .lf-greeting p {
+            font-size: .9rem;
+            color: #999;
+        }
 
-            body {
-                font-family: 'Inter', sans-serif;
-                background: var(--bg);
-                color: var(--text);
-                min-height: 100vh;
-                display: flex;
-            }
+    .lf-post-btn {
+        background: #fff;
+        color: #1a1a1a;
+        font-weight: 600;
+        font-size: .875rem;
+        padding: 11px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border: none;
+        transition: background .15s, color .15s;
+    }
 
-            /* ── Sidebar ── */
-            .sidebar {
-                width: 240px;
-                min-height: 100vh;
-                background: var(--surface);
-                border-right: 1px solid var(--border);
-                display: flex;
-                flex-direction: column;
-                padding: 28px 20px;
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-            }
+        .lf-post-btn:hover {
+            background: #E91E8C;
+            color: #fff;
+        }
 
-            .logo {
-                font-family: 'Syne', sans-serif;
-                font-size: 1.25rem;
-                font-weight: 800;
-                color: var(--accent);
-                letter-spacing: -0.5px;
-                margin-bottom: 36px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
+    /* STATS */
+    .lf-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 36px;
+    }
 
-            .logo-dot {
-                width: 8px;
-                height: 8px;
-                background: var(--accent);
-                border-radius: 50%;
-                display: inline-block;
-            }
+    .lf-stat {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px 22px;
+        border: 1px solid #EBEBEB;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: border-color .2s;
+    }
 
-            .nav {
-                list-style: none;
-                flex: 1;
-            }
+        .lf-stat:hover {
+            border-color: #C2185B;
+        }
 
-                .nav li + li {
-                    margin-top: 4px;
-                }
+    .lf-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        background: #F8F9FA;
+    }
 
-                .nav a {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    padding: 10px 14px;
-                    border-radius: 10px;
-                    font-size: .875rem;
-                    font-weight: 500;
-                    color: var(--muted);
-                    text-decoration: none;
-                    transition: background .15s, color .15s;
-                }
+    .lf-stat-num {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        line-height: 1;
+    }
 
-                    .nav a:hover, .nav a.active {
-                        background: var(--accent-lt);
-                        color: var(--accent);
-                    }
+    .lf-stat-label {
+        font-size: .72rem;
+        color: #AAA;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-top: 4px;
+    }
 
-            .nav-icon {
-                font-size: 1rem;
-                width: 20px;
-                text-align: center;
-            }
+    /* SECTION HEADER */
+    .lf-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
 
-            .sidebar-footer {
-                border-top: 1px solid var(--border);
-                padding-top: 18px;
-                font-size: .8rem;
-                color: var(--muted);
-            }
+    .lf-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
 
-            .user-pill {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 12px;
-            }
+    .lf-filters {
+        display: flex;
+        gap: 6px;
+    }
 
-            .avatar {
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                background: var(--accent);
-                color: #fff;
-                font-weight: 700;
-                font-size: .85rem;
-                display: grid;
-                place-items: center;
-            }
+    .lf-filter {
+        padding: 5px 14px;
+        border-radius: 6px;
+        font-size: .78rem;
+        font-weight: 600;
+        border: 1px solid #E0E0E0;
+        background: #fff;
+        color: #888;
+        cursor: pointer;
+        transition: all .15s;
+        text-decoration: none;
+    }
 
-            .user-name {
-                font-size: .85rem;
-                font-weight: 600;
-                color: var(--text);
-            }
+        .lf-filter.active, .lf-filter:hover {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
 
-            .logout-btn {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                background: transparent;
-                color: var(--muted);
-                font-size: .8rem;
-                cursor: pointer;
-                transition: background .15s;
-            }
+    /* GRID */
+    .lf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 14px;
+    }
 
-                .logout-btn:hover {
-                    background: #ffeaea;
-                    color: var(--red);
-                    border-color: var(--red);
-                }
+    .lf-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #EBEBEB;
+        transition: border-color .2s, box-shadow .2s;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-            /* ── Main ── */
-            .main {
-                margin-left: 240px;
-                flex: 1;
-                padding: 36px 40px;
-            }
+        .lf-card:hover {
+            border-color: #ddd;
+            box-shadow: 0 4px 18px rgba(0,0,0,.07);
+        }
 
-            .page-header {
-                margin-bottom: 32px;
-            }
+    .lf-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
 
-            .greeting {
-                font-family: 'Syne', sans-serif;
-                font-size: 1.75rem;
-                font-weight: 800;
-                letter-spacing: -0.5px;
-                color: var(--text);
-            }
+    .lf-card-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        line-height: 1.3;
+    }
 
-                .greeting span {
-                    color: var(--accent);
-                }
+    .lf-tag {
+        font-size: .65rem;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
 
-            .subtext {
-                margin-top: 4px;
-                font-size: .9rem;
-                color: var(--muted);
-            }
+    .lf-tag-lost {
+        background: #FFF0F0;
+        color: #C62828;
+        border: 1px solid #FFCDD2;
+    }
 
-            /* ── Stats Grid ── */
-            .stats-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 18px;
-                margin-bottom: 32px;
-            }
+    .lf-tag-found {
+        background: #F0FFF8;
+        color: #2E7D32;
+        border: 1px solid #C8F7DC;
+    }
 
-            .stat-card {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 22px 24px;
-                box-shadow: var(--shadow);
-                position: relative;
-                overflow: hidden;
-                transition: transform .2s;
-            }
+    .lf-desc {
+        font-size: .85rem;
+        color: #777;
+        line-height: 1.65;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 
-                .stat-card:hover {
-                    transform: translateY(-2px);
-                }
+    .lf-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px solid #F0F0F0;
+    }
 
-                .stat-card::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    height: 3px;
-                    border-radius: var(--radius) var(--radius) 0 0;
-                }
+    .lf-meta-cat {
+        font-size: .72rem;
+        color: #AAA;
+        font-weight: 500;
+    }
 
-                .stat-card.blue::before {
-                    background: var(--accent);
-                }
+    .lf-view {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #C2185B;
+        text-decoration: none;
+        transition: letter-spacing .15s;
+    }
 
-                .stat-card.green::before {
-                    background: var(--green);
-                }
+        .lf-view:hover {
+            letter-spacing: .02em;
+        }
 
-                .stat-card.amber::before {
-                    background: var(--amber);
-                }
+    /* EMPTY */
+    .lf-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 24px;
+        color: #bbb;
+    }
 
-                .stat-card.red::before {
-                    background: var(--red);
-                }
+    .lf-empty-icon {
+        font-size: 3rem;
+        margin-bottom: 14px;
+        display: block;
+    }
 
-            .stat-label {
-                font-size: .75rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: .06em;
-                color: var(--muted);
-                margin-bottom: 10px;
-            }
+    .lf-empty-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #999;
+        margin-bottom: 6px;
+    }
 
-            .stat-value {
-                font-family: 'Syne', sans-serif;
-                font-size: 2rem;
-                font-weight: 800;
-                color: var(--text);
-                line-height: 1;
-            }
+    .lf-empty-sub {
+        font-size: .85rem;
+        color: #bbb;
+        margin-bottom: 22px;
+    }
 
-            .stat-change {
-                margin-top: 8px;
-                font-size: .78rem;
-                color: var(--green);
-                font-weight: 500;
-            }
+    .lf-empty-btn {
+        display: inline-block;
+        background: #1a1a1a;
+        color: #fff;
+        padding: 11px 26px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: .875rem;
+        transition: background .15s;
+    }
 
-            /* ── Two columns ── */
-            .two-col {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 18px;
-            }
+        .lf-empty-btn:hover {
+            background: #C2185B;
+        }
+</style>
 
-            .card {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 24px;
-                box-shadow: var(--shadow);
-            }
+<!-- Nav -->
+<nav class="lf-nav">
+    <div class="lf-nav-logo">Lost<span>&</span>Found</div>
+    <div class="lf-nav-right">
+        <span class="lf-nav-user">Hello, <strong>@userName</strong></span>
+        <a href="/Account/Logout" class="lf-logout">Sign out</a>
+    </div>
+</nav>
 
-            .card-title {
-                font-size: .95rem;
-                font-weight: 700;
-                color: var(--text);
-                margin-bottom: 18px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
+<div class="lf-wrap">
 
-                .card-title a {
-                    font-size: .78rem;
-                    font-weight: 500;
-                    color: var(--accent);
-                    text-decoration: none;
-                }
-
-            /* ── Item list ── */
-            .item-list {
-                list-style: none;
-            }
-
-                .item-list li {
-                    display: flex;
-                    align-items: center;
-                    gap: 14px;
-                    padding: 12px 0;
-                    border-bottom: 1px solid var(--border);
-                }
-
-                    .item-list li:last-child {
-                        border-bottom: none;
-                    }
-
-            .item-icon {
-                width: 36px;
-                height: 36px;
-                border-radius: 9px;
-                display: grid;
-                place-items: center;
-                font-size: 1rem;
-                flex-shrink: 0;
-            }
-
-                .item-icon.lost {
-                    background: #FFF0F0;
-                }
-
-                .item-icon.found {
-                    background: #EDFBF5;
-                }
-
-            .item-info {
-                flex: 1;
-            }
-
-            .item-name {
-                font-size: .875rem;
-                font-weight: 600;
-                color: var(--text);
-            }
-
-            .item-meta {
-                font-size: .75rem;
-                color: var(--muted);
-                margin-top: 2px;
-            }
-
-            .badge {
-                font-size: .7rem;
-                font-weight: 600;
-                padding: 3px 9px;
-                border-radius: 99px;
-            }
-
-                .badge.lost {
-                    background: #FFF0F0;
-                    color: var(--red);
-                }
-
-                .badge.found {
-                    background: #EDFBF5;
-                    color: var(--green);
-                }
-
-                .badge.pending {
-                    background: #FFF8EC;
-                    color: var(--amber);
-                }
-
-            /* ── Quick actions ── */
-            .action-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-
-            .action-btn {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 14px 16px;
-                border-radius: 10px;
-                border: 1px solid var(--border);
-                background: var(--bg);
-                color: var(--text);
-                font-size: .85rem;
-                font-weight: 500;
-                cursor: pointer;
-                text-decoration: none;
-                transition: background .15s, border-color .15s;
-            }
-
-                .action-btn:hover {
-                    background: var(--accent-lt);
-                    border-color: var(--accent);
-                    color: var(--accent);
-                }
-
-                .action-btn .action-icon {
-                    font-size: 1.1rem;
-                }
-
-            /* ── Counter animation ── */
-            @@keyframes countUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(8px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .stat-value {
-                animation: countUp .5s ease both;
-            }
-
-            .stat-card:nth-child(2) .stat-value {
-                animation-delay: .08s;
-            }
-
-            .stat-card:nth-child(3) .stat-value {
-                animation-delay: .16s;
-            }
-
-            .stat-card:nth-child(4) .stat-value {
-                animation-delay: .24s;
-            }
-    </style>
-</head>
-<body>
-
-    <!-- ── Sidebar ── -->
-    <aside class="sidebar">
-        <div class="logo">
-            <span class="logo-dot"></span> LostAndFound
+    <!-- Greeting -->
+    <div class="lf-greeting">
+        <div>
+            <h1>Good to see you, <span>@userName</span></h1>
+            <p>Here's what's been reported so far.</p>
         </div>
+        <a class="lf-post-btn" asp-controller="Items" asp-action="Add">+ Post an item</a>
+    </div>
 
-        <ul class="nav">
-            <li>
-                <a href="#" class="active">
-                    <span class="nav-icon">⊞</span> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="nav-icon">📋</span> All Items
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="nav-icon">🔍</span> Report Lost
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="nav-icon">📦</span> Report Found
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="nav-icon">🔔</span> My Claims
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <span class="nav-icon">⚙️</span> Settings
-                </a>
-            </li>
-        </ul>
-
-        <div class="sidebar-footer">
-            <div class="user-pill">
-                <div class="avatar">@(ViewBag.UserName != null ? ViewBag.UserName.ToString().Substring(0, 1).ToUpper() : "U")</div>
-                <div>
-                    <div class="user-name">@(ViewBag.UserName ?? "User")</div>
-                    <div style="font-size:.72rem;color:var(--muted)">Member</div>
-                </div>
-            </div>
-            <a href="/Account/Logout">
-                <button class="logout-btn">Sign out</button>
-            </a>
-        </div>
-    </aside>
-
-    <!-- ── Main Content ── -->
-    <main class="main">
-        <div class="page-header">
-            <h1 class="greeting">Welcome , <span>@(ViewBag.UserName ?? "there")</span> 👋</h1>
-            <p class="subtext">Here's what's happening on LostAndFound today.</p>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card blue">
-                <div class="stat-label">Total Items</div>
-                <div class="stat-value">@(ViewBag.TotalItems ?? 0)</div>
-                <div class="stat-change">↑ All reported items</div>
-            </div>
-            <div class="stat-card red">
-                <div class="stat-label">Lost Items</div>
-                <div class="stat-value">@(ViewBag.LostItems ?? 0)</div>
-                <div class="stat-change" style="color:var(--red)">Awaiting recovery</div>
-            </div>
-            <div class="stat-card green">
-                <div class="stat-label">Found Items</div>
-                <div class="stat-value">@(ViewBag.FoundItems ?? 0)</div>
-                <div class="stat-change">Ready to claim</div>
-            </div>
-            <div class="stat-card amber">
-                <div class="stat-label">Claims Pending</div>
-                <div class="stat-value">@(ViewBag.PendingClaims ?? 0)</div>
-                <div class="stat-change" style="color:var(--amber)">Needs review</div>
+    <!-- Stats -->
+    <div class="lf-stats">
+        <div class="lf-stat">
+            <div class="lf-stat-icon">📋</div>
+            <div>
+                <div class="lf-stat-num">@items.Count</div>
+                <div class="lf-stat-label">Total Items</div>
             </div>
         </div>
-
-        <!-- Two columns -->
-        <div class="two-col">
-            <!-- Recent Items -->
-            <div class="card">
-                <div class="card-title">
-                    Recent Items
-                    <a href="#">View all →</a>
-                </div>
-                <ul class="item-list">
-                    <li>
-                        <div class="item-icon lost">🎒</div>
-                        <div class="item-info">
-                            <div class="item-name">Black Backpack</div>
-                            <div class="item-meta">Reported 2 hours ago</div>
-                        </div>
-                        <span class="badge lost">Lost</span>
-                    </li>
-                    <li>
-                        <div class="item-icon found">📱</div>
-                        <div class="item-info">
-                            <div class="item-name">iPhone 14 Pro</div>
-                            <div class="item-meta">Reported 5 hours ago</div>
-                        </div>
-                        <span class="badge found">Found</span>
-                    </li>
-                    <li>
-                        <div class="item-icon lost">🔑</div>
-                        <div class="item-info">
-                            <div class="item-name">Car Keys</div>
-                            <div class="item-meta">Reported yesterday</div>
-                        </div>
-                        <span class="badge lost">Lost</span>
-                    </li>
-                    <li>
-                        <div class="item-icon found">👜</div>
-                        <div class="item-info">
-                            <div class="item-name">Brown Handbag</div>
-                            <div class="item-meta">Reported yesterday</div>
-                        </div>
-                        <span class="badge pending">Claimed</span>
-                    </li>
-                </ul>
+        <div class="lf-stat">
+            <div class="lf-stat-icon">🔎</div>
+            <div>
+                <div class="lf-stat-num">@lostCount</div>
+                <div class="lf-stat-label">Lost Items</div>
             </div>
+        </div>
+        <div class="lf-stat">
+            <div class="lf-stat-icon">✅</div>
+            <div>
+                <div class="lf-stat-num">@foundCount</div>
+                <div class="lf-stat-label">Found Items</div>
+            </div>
+        </div>
+    </div>
 
-            <!-- Quick Actions -->
-            <div class="card">
-                <div class="card-title">Quick Actions</div>
-                <div class="action-grid">
-                    <a href="#" class="action-btn">
-                        <span class="action-icon">🔍</span> Report Lost Item
-                    </a>
-                    <a href="#" class="action-btn">
-                        <span class="action-icon">📦</span> Report Found Item
-                    </a>
-                    <a href="#" class="action-btn">
-                        <span class="action-icon">📋</span> Browse Items
-                    </a>
-                    <a href="#" class="action-btn">
-                        <span class="action-icon">🔔</span> My Claims
-                    </a>
-                </div>
+    <!-- Section Header -->
+    <div class="lf-section-header">
+        <div class="lf-section-title">All Items</div>
+        <div class="lf-filters">
+            <a class="lf-filter active" href="#">All</a>
+            <a class="lf-filter" href="#">Lost</a>
+            <a class="lf-filter" href="#">Found</a>
+        </div>
+    </div>
 
-                <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-                    <div class="card-title" style="margin-bottom:12px">System Status</div>
-                    <div style="display:flex;flex-direction:column;gap:10px">
-                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
-                            <span style="color:var(--muted)">Database</span>
-                            <span style="color:var(--green);font-weight:600">● Connected</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
-                            <span style="color:var(--muted)">Last sync</span>
-                            <span style="font-weight:500">Just now</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
-                            <span style="color:var(--muted)">Active users</span>
-                            <span style="font-weight:500">@(ViewBag.TotalUsers ?? 0)</span>
-                        </div>
+    <!-- Cards -->
+    <div class="lf-grid">
+        @if (!items.Any())
+        {
+            <div class="lf-empty">
+                <span class="lf-empty-icon">🔍</span>
+                <div class="lf-empty-title">Nothing here yet</div>
+                <p class="lf-empty-sub">Be the first to post a lost or found item.</p>
+                <a class="lf-empty-btn" asp-controller="Items" asp-action="Add">+ Post an item</a>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in items)
+            {
+                var tagClass = item.Status == "Lost" ? "lf-tag-lost" : "lf-tag-found";
+
+                <div class="lf-card">
+                    <div class="lf-card-top">
+                        <p class="lf-card-title">@item.Title</p>
+                        <span class="lf-tag @tagClass">@item.Status</span>
+                    </div>
+                    <p class="lf-desc">@item.Description</p>
+                    <div class="lf-meta">
+                        <span class="lf-meta-cat">@(item.Category?.Name ?? "Uncategorized")</span>
+                        <a class="lf-view" asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">View →</a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
-
-</body>
-</html>
+            }
+        }
+    </div>
+</div>

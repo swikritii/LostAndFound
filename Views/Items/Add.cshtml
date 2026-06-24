@@ -1,0 +1,42 @@
+﻿@model LostAndFound.Models.AddItemViewModel
+
+<div class="lf-wrap">
+    <p class="lf-title">Post an item</p>
+    <p class="lf-sub">Fill in the details below</p>
+
+    <form method="post" style="margin-top: 1.5rem; max-width: 480px;">
+        <div asp-validation-summary="All" style="color: #A32D2D; margin-bottom: 1rem;"></div>
+
+        <div style="margin-bottom: 1rem;">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" asp-for="Title">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label class="form-label">Status</label>
+            <select class="form-control" asp-for="Status">
+                <option value="">-- Select --</option>
+                <option value="Lost">Lost</option>
+                <option value="Found">Found</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Category</label>
+            <select class="form-control" asp-for="CategoryId">
+                <option value="">-- Select --</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="lf-post-btn" style="border: none; cursor: pointer;">Post item</button>
+    </form>
+</div>

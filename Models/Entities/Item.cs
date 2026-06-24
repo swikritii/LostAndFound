@@ -8,7 +8,7 @@
         public string Status { get; set; }
         public DateTime ReportedAt { get; set; } = DateTime.UtcNow;
 
-        public int UserId { get; set; }
+        public int UserId { get; set; }      
         public User User { get; set; }
 
         public int CategoryId { get; set; }

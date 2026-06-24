@@ -105,4 +105,5 @@ C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\refint\Los
 C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\LostAndFound.pdb
 C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\LostAndFound.genruntimeconfig.cache
 C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\ref\LostAndFound.dll
+C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\LostAndFound.sourcelink.json
 C:\Users\Acer\source\repos\LostAndFound\LostAndFound\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

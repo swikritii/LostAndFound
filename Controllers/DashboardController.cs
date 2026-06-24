@@ -27,7 +27,9 @@ namespace LostAndFound.Controllers
             ViewBag.PendingClaims = await _context.ItemClaims.CountAsync();
             ViewBag.TotalUsers = await _context.Users.CountAsync();
 
-            return View();
+            // Load items and pass as the strongly-typed model expected by the view
+            var items = await _context.Items.ToListAsync();
+            return View(items);
         }
     }
 }

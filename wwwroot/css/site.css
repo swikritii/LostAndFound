@@ -1,31 +1,85 @@
-html {
-  font-size: 14px;
+.lf-wrap {
+    background: #FAF7F2;
+    padding: 2rem 2rem 2.5rem;
+    border-radius: 10px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.lf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid #DCD5C8;
+    padding-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.lf-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #2B2926;
+    margin: 0;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.lf-sub {
+    font-size: 13px;
+    color: #8A8475;
+    margin-top: 4px;
 }
 
-body {
-  margin-bottom: 60px;
+.lf-post-btn {
+    background: #3F5D4E;
+    color: #FAF7F2 !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none !important;
+    display: inline-block;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    .lf-post-btn:hover {
+        background: #34503F;
+    }
+
+.lf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.lf-card {
+    background: #FFFDF9;
+    border: 1px solid #E4DDCF;
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
 }
+
+.lf-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.lf-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2B2926;
+    margin: 0;
+}
+
+.lf-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.lf-tag-lost {
+    background: #F6E4D2;

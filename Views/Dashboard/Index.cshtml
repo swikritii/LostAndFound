@@ -1,0 +1,601 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — LostAndFound</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+            *, *::before, *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --bg: #F7F8FA;
+                --surface: #FFFFFF;
+                --border: #E8EAF0;
+                --text: #111318;
+                --muted: #7A7F8E;
+                --accent: #3D5AFE;
+                --accent-lt: #EEF1FF;
+                --green: #00C48C;
+                --amber: #FFB930;
+                --red: #FF5C5C;
+                --radius: 14px;
+                --shadow: 0 2px 16px rgba(0,0,0,.06);
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                min-height: 100vh;
+                display: flex;
+            }
+
+            /* ── Sidebar ── */
+            .sidebar {
+                width: 240px;
+                min-height: 100vh;
+                background: var(--surface);
+                border-right: 1px solid var(--border);
+                display: flex;
+                flex-direction: column;
+                padding: 28px 20px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+            }
+
+            .logo {
+                font-family: 'Syne', sans-serif;
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: var(--accent);
+                letter-spacing: -0.5px;
+                margin-bottom: 36px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .logo-dot {
+                width: 8px;
+                height: 8px;
+                background: var(--accent);
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            .nav {
+                list-style: none;
+                flex: 1;
+            }
+
+                .nav li + li {
+                    margin-top: 4px;
+                }
+
+                .nav a {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 14px;
+                    border-radius: 10px;
+                    font-size: .875rem;
+                    font-weight: 500;
+                    color: var(--muted);
+                    text-decoration: none;
+                    transition: background .15s, color .15s;
+                }
+
+                    .nav a:hover, .nav a.active {
+                        background: var(--accent-lt);
+                        color: var(--accent);
+                    }
+
+            .nav-icon {
+                font-size: 1rem;
+                width: 20px;
+                text-align: center;
+            }
+
+            .sidebar-footer {
+                border-top: 1px solid var(--border);
+                padding-top: 18px;
+                font-size: .8rem;
+                color: var(--muted);
+            }
+
+            .user-pill {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .avatar {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: var(--accent);
+                color: #fff;
+                font-weight: 700;
+                font-size: .85rem;
+                display: grid;
+                place-items: center;
+            }
+
+            .user-name {
+                font-size: .85rem;
+                font-weight: 600;
+                color: var(--text);
+            }
+
+            .logout-btn {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                background: transparent;
+                color: var(--muted);
+                font-size: .8rem;
+                cursor: pointer;
+                transition: background .15s;
+            }
+
+                .logout-btn:hover {
+                    background: #ffeaea;
+                    color: var(--red);
+                    border-color: var(--red);
+                }
+
+            /* ── Main ── */
+            .main {
+                margin-left: 240px;
+                flex: 1;
+                padding: 36px 40px;
+            }
+
+            .page-header {
+                margin-bottom: 32px;
+            }
+
+            .greeting {
+                font-family: 'Syne', sans-serif;
+                font-size: 1.75rem;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+                color: var(--text);
+            }
+
+                .greeting span {
+                    color: var(--accent);
+                }
+
+            .subtext {
+                margin-top: 4px;
+                font-size: .9rem;
+                color: var(--muted);
+            }
+
+            /* ── Stats Grid ── */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 18px;
+                margin-bottom: 32px;
+            }
+
+            .stat-card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 22px 24px;
+                box-shadow: var(--shadow);
+                position: relative;
+                overflow: hidden;
+                transition: transform .2s;
+            }
+
+                .stat-card:hover {
+                    transform: translateY(-2px);
+                }
+
+                .stat-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    border-radius: var(--radius) var(--radius) 0 0;
+                }
+
+                .stat-card.blue::before {
+                    background: var(--accent);
+                }
+
+                .stat-card.green::before {
+                    background: var(--green);
+                }
+
+                .stat-card.amber::before {
+                    background: var(--amber);
+                }
+
+                .stat-card.red::before {
+                    background: var(--red);
+                }
+
+            .stat-label {
+                font-size: .75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                color: var(--muted);
+                margin-bottom: 10px;
+            }
+
+            .stat-value {
+                font-family: 'Syne', sans-serif;
+                font-size: 2rem;
+                font-weight: 800;
+                color: var(--text);
+                line-height: 1;
+            }
+
+            .stat-change {
+                margin-top: 8px;
+                font-size: .78rem;
+                color: var(--green);
+                font-weight: 500;
+            }
+
+            /* ── Two columns ── */
+            .two-col {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+            }
+
+            .card {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 24px;
+                box-shadow: var(--shadow);
+            }
+
+            .card-title {
+                font-size: .95rem;
+                font-weight: 700;
+                color: var(--text);
+                margin-bottom: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+                .card-title a {
+                    font-size: .78rem;
+                    font-weight: 500;
+                    color: var(--accent);
+                    text-decoration: none;
+                }
+
+            /* ── Item list ── */
+            .item-list {
+                list-style: none;
+            }
+
+                .item-list li {
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                    padding: 12px 0;
+                    border-bottom: 1px solid var(--border);
+                }
+
+                    .item-list li:last-child {
+                        border-bottom: none;
+                    }
+
+            .item-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 9px;
+                display: grid;
+                place-items: center;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+
+                .item-icon.lost {
+                    background: #FFF0F0;
+                }
+
+                .item-icon.found {
+                    background: #EDFBF5;
+                }
+
+            .item-info {
+                flex: 1;
+            }
+
+            .item-name {
+                font-size: .875rem;
+                font-weight: 600;
+                color: var(--text);
+            }
+
+            .item-meta {
+                font-size: .75rem;
+                color: var(--muted);
+                margin-top: 2px;
+            }
+
+            .badge {
+                font-size: .7rem;
+                font-weight: 600;
+                padding: 3px 9px;
+                border-radius: 99px;
+            }
+
+                .badge.lost {
+                    background: #FFF0F0;
+                    color: var(--red);
+                }
+
+                .badge.found {
+                    background: #EDFBF5;
+                    color: var(--green);
+                }
+
+                .badge.pending {
+                    background: #FFF8EC;
+                    color: var(--amber);
+                }
+
+            /* ── Quick actions ── */
+            .action-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .action-btn {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 16px;
+                border-radius: 10px;
+                border: 1px solid var(--border);
+                background: var(--bg);
+                color: var(--text);
+                font-size: .85rem;
+                font-weight: 500;
+                cursor: pointer;
+                text-decoration: none;
+                transition: background .15s, border-color .15s;
+            }
+
+                .action-btn:hover {
+                    background: var(--accent-lt);
+                    border-color: var(--accent);
+                    color: var(--accent);
+                }
+
+                .action-btn .action-icon {
+                    font-size: 1.1rem;
+                }
+
+            /* ── Counter animation ── */
+            @@keyframes countUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .stat-value {
+                animation: countUp .5s ease both;
+            }
+
+            .stat-card:nth-child(2) .stat-value {
+                animation-delay: .08s;
+            }
+
+            .stat-card:nth-child(3) .stat-value {
+                animation-delay: .16s;
+            }
+
+            .stat-card:nth-child(4) .stat-value {
+                animation-delay: .24s;
+            }
+    </style>
+</head>
+<body>
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="logo-dot"></span> LostAndFound
+        </div>
+
+        <ul class="nav">
+            <li>
+                <a href="#" class="active">
+                    <span class="nav-icon">⊞</span> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">📋</span> All Items
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">🔍</span> Report Lost
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">📦</span> Report Found
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">🔔</span> My Claims
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="nav-icon">⚙️</span> Settings
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="avatar">@(ViewBag.UserName != null ? ViewBag.UserName.ToString().Substring(0, 1).ToUpper() : "U")</div>
+                <div>
+                    <div class="user-name">@(ViewBag.UserName ?? "User")</div>
+                    <div style="font-size:.72rem;color:var(--muted)">Member</div>
+                </div>
+            </div>
+            <a href="/Account/Logout">
+                <button class="logout-btn">Sign out</button>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main">
+        <div class="page-header">
+            <h1 class="greeting">Welcome , <span>@(ViewBag.UserName ?? "there")</span> 👋</h1>
+            <p class="subtext">Here's what's happening on LostAndFound today.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-label">Total Items</div>
+                <div class="stat-value">@(ViewBag.TotalItems ?? 0)</div>
+                <div class="stat-change">↑ All reported items</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-label">Lost Items</div>
+                <div class="stat-value">@(ViewBag.LostItems ?? 0)</div>
+                <div class="stat-change" style="color:var(--red)">Awaiting recovery</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-label">Found Items</div>
+                <div class="stat-value">@(ViewBag.FoundItems ?? 0)</div>
+                <div class="stat-change">Ready to claim</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-label">Claims Pending</div>
+                <div class="stat-value">@(ViewBag.PendingClaims ?? 0)</div>
+                <div class="stat-change" style="color:var(--amber)">Needs review</div>
+            </div>
+        </div>
+
+        <!-- Two columns -->
+        <div class="two-col">
+            <!-- Recent Items -->
+            <div class="card">
+                <div class="card-title">
+                    Recent Items
+                    <a href="#">View all →</a>
+                </div>
+                <ul class="item-list">
+                    <li>
+                        <div class="item-icon lost">🎒</div>
+                        <div class="item-info">
+                            <div class="item-name">Black Backpack</div>
+                            <div class="item-meta">Reported 2 hours ago</div>
+                        </div>
+                        <span class="badge lost">Lost</span>
+                    </li>
+                    <li>
+                        <div class="item-icon found">📱</div>
+                        <div class="item-info">
+                            <div class="item-name">iPhone 14 Pro</div>
+                            <div class="item-meta">Reported 5 hours ago</div>
+                        </div>
+                        <span class="badge found">Found</span>
+                    </li>
+                    <li>
+                        <div class="item-icon lost">🔑</div>
+                        <div class="item-info">
+                            <div class="item-name">Car Keys</div>
+                            <div class="item-meta">Reported yesterday</div>
+                        </div>
+                        <span class="badge lost">Lost</span>
+                    </li>
+                    <li>
+                        <div class="item-icon found">👜</div>
+                        <div class="item-info">
+                            <div class="item-name">Brown Handbag</div>
+                            <div class="item-meta">Reported yesterday</div>
+                        </div>
+                        <span class="badge pending">Claimed</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-title">Quick Actions</div>
+                <div class="action-grid">
+                    <a href="#" class="action-btn">
+                        <span class="action-icon">🔍</span> Report Lost Item
+                    </a>
+                    <a href="#" class="action-btn">
+                        <span class="action-icon">📦</span> Report Found Item
+                    </a>
+                    <a href="#" class="action-btn">
+                        <span class="action-icon">📋</span> Browse Items
+                    </a>
+                    <a href="#" class="action-btn">
+                        <span class="action-icon">🔔</span> My Claims
+                    </a>
+                </div>
+
+                <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+                    <div class="card-title" style="margin-bottom:12px">System Status</div>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
+                            <span style="color:var(--muted)">Database</span>
+                            <span style="color:var(--green);font-weight:600">● Connected</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
+                            <span style="color:var(--muted)">Last sync</span>
+                            <span style="font-weight:500">Just now</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.85rem">
+                            <span style="color:var(--muted)">Active users</span>
+                            <span style="font-weight:500">@(ViewBag.TotalUsers ?? 0)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

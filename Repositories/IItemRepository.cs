@@ -1,5 +1,4 @@
 ﻿using LostAndFound.Models.Entities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace LostAndFound.Repositories
 {
